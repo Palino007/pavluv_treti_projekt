@@ -1,17 +1,13 @@
 # Třetí projekt do Engeto Online Python Akademie
 
-Tento projekt ukazuje, jak stáhnout a zpracovat data z webu pomocí Pythonu.  
-Používá knihovny:
-
-- `requests`
-- `beautifulsoup4`
-- `sys` (součást Pythonu)
-- `csv` (součást Pythonu)
+Tento projekt slouží k extrahování výsledků z parlamentních voleb v roce 2017. Odkaz k prohlédnutí najdete [zde](https://www.volby.cz/pls/ps2017nss/ps3?xjazyk=CZ).
 
 ## Instalace
 
-1. Ujistěte se, že máte nainstalovaný Python (verze 3.6 a vyšší).  
-2. Nainstalujte potřebné knihovny: `pip install -r requirements.txt`
+Knihovny, které jsou použity v kódu jsou uložené v souboru requirements.txt. Pro instalaci doporučuji použít nové virtuální prostředí a s nainstalovaným manažerem spustit následovně:
+
+pip --version
+pip install -r requirements.txt 
 
 ## Spuštění
 
@@ -24,7 +20,7 @@ Projekt se spouští jednoduchým příkazem: python main.py "<URL>" "<vystupni_
 Tento příkaz stáhne výsledky voleb z daného odkazu a uloží je do souboru `vysledky_benesov.csv`.
 
 ## Poznámky
-
-- Soubor `requirements.txt` obsahuje všechny potřebné knihovny pro tento projekt.  
+ 
 - Výstupní soubor CSV bude vytvořen ve stejném adresáři, kde je spuštěn skript.
+
 
