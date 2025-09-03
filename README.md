@@ -23,7 +23,7 @@ Tento příkaz stáhne výsledky voleb z daného odkazu a uloží je do souboru 
  
 - Výstupní soubor CSV bude vytvořen ve stejném adresáři, kde je spuštěn skript.
 
-Ukázka z výstupního CSV souboru:
+## Ukázka z výstupního CSV souboru:
 code	location	registered	envelopes	valid	Občanská demokratická strana	Řád národa - Vlastenecká unie	CESTA ODPOVĚDNÉ SPOLEČNOSTI	Česká str.sociálně demokrat.
 529303	Benešov	13104	8485	8437	1052	10	2	624
 532568	Bernartice	191	148	148	4	0	0	17
