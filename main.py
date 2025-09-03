@@ -5,14 +5,12 @@ author: Pavol Medo
 email: palimedo@gmail.com
 """
 
-#### IMPORTY
-
 import sys
-import requests
-from bs4 import BeautifulSoup
 import csv
 
-#### FUNKCE PRO KONTROLU ARGUMENTŮ
+import requests
+from bs4 import BeautifulSoup
+
 
 def over_argumenty():
     """
@@ -20,11 +18,13 @@ def over_argumenty():
     Pokud ne, vypíše chybu a ukončí program.
     """
     if len(sys.argv) != 3:
-        print("Chyba: Skript potřebuje přesně dva argumenty.")
-        print("Použití: python main.py 'URL_na_ps32' 'vystupni_soubor.csv'")
+        print(
+            "Chyba: Skript potřebuje přesně dva argumenty.",
+            "Použití: python main.py 'URL_na_ps32' 'vystupni_soubor.csv'",
+            sep="\n",
+        )
         sys.exit(1)
 
-#### FUNKCE PRO STAŽENÍ STRÁNKY
 
 def stahni_stranku(url_adresa):
     """
@@ -36,12 +36,11 @@ def stahni_stranku(url_adresa):
     :rtype: str
     """
     odpoved = requests.get(url_adresa)
-    if odpoved.status_code != 200:
+    if not odpoved.ok:
         print("Chyba při stahování stránky:", url_adresa)
         sys.exit(1)
     return odpoved.text
 
-#### FUNKCE PRO ZÍSKÁNÍ SEZNAMU OBCÍ
 
 def najdi_obce_na_strance_vyber_obce(url_adresa_ps32):
     """
@@ -82,14 +81,13 @@ def najdi_obce_na_strance_vyber_obce(url_adresa_ps32):
 
     return pole_obci
 
-#### FUNKCE PRO ZÍSKÁNÍ NÁZVŮ STRAN A HLASŮ Z DETAILU OBCE
 
 def ziskej_prehled_stran_a_hlasu_ze_soup(soup_objekt):
     """
     Z detailu obce (ps311) projde tabulky 'část 1' a 'část 2' a vrátí:
     - seznam_nazvu_stran (list názvů stran v pořadí)
     - slovnik_hlasu (mapa {název_strany: hlasy_celkem} pro tuto obec)
-    Filtrace je jednoduchá: bereme jen řádky, kde první buňka je číslo (1–30),
+    Filtrace: bereme jen řádky, kde první buňka je číslo (1–30),
     druhá buňka obsahuje text (název strany) a třetí buňka je počet hlasů.
 
     :param soup_objekt: BeautifulSoup objekt stránky detailu obce.
@@ -116,17 +114,21 @@ def ziskej_prehled_stran_a_hlasu_ze_soup(soup_objekt):
             text_hlasy_celkem = vsechny_bunky[2].get_text(strip=True).replace("\xa0", "")
 
             # vyfiltrujeme jen řádky se stranami (první buňka je celé číslo a druhá obsahuje písmena)
+
             if text_cislo.isdigit() and any(znak.isalpha() for znak in text_nazev):
-                # přidáme do seznamu názvů (pokud tam ještě není) a do slovníku hlasů
                 if text_nazev not in seznam_nazvu_stran:
                     seznam_nazvu_stran.append(text_nazev)
                 slovnik_hlasu[text_nazev] = text_hlasy_celkem
 
     return seznam_nazvu_stran, slovnik_hlasu
 
-#### FUNKCE PRO ZPRACOVÁNÍ DETAILU JEDNÉ OBCE
 
-def zpracuj_detail_obce(kod_obce, nazev_obce, url_detail_obce, pevne_poradi_stran):
+def zpracuj_detail_obce(
+        kod_obce,
+        nazev_obce,
+        url_detail_obce,
+        pevne_poradi_stran
+):
     """
     Vytvoří jeden řádek pro CSV s hlasy pro všechny strany.
 
@@ -145,15 +147,31 @@ def zpracuj_detail_obce(kod_obce, nazev_obce, url_detail_obce, pevne_poradi_stra
     soup = BeautifulSoup(html_text, "html.parser")
 
     # souhrnné počty
+
     bunka_volici = soup.find("td", {"headers": "sa2"})
     bunka_obalky = soup.find("td", {"headers": "sa3"})
     bunka_platne = soup.find("td", {"headers": "sa6"})
 
-    volici_v_seznamu = bunka_volici.get_text(strip=True).replace("\xa0", "") if bunka_volici else ""
-    vydane_obalky = bunka_obalky.get_text(strip=True).replace("\xa0", "") if bunka_obalky else ""
-    platne_hlasy = bunka_platne.get_text(strip=True).replace("\xa0", "") if bunka_platne else ""
+    volici_v_seznamu = (
+        bunka_volici.get_text(strip=True).replace("\xa0", "")
+        if bunka_volici
+        else ""
+    )
+    
+    vydane_obalky = (
+        bunka_obalky.get_text(strip=True).replace("\xa0", "")
+        if bunka_obalky
+        else ""
+    )
+
+    platne_hlasy = (
+        bunka_platne.get_text(strip=True).replace("\xa0", "")
+        if bunka_platne
+        else ""
+    )
 
     # hlasy pro strany (vezmeme slovník a pak srovnáme do pevného pořadí z první obce)
+
     _, slovnik_hlasu = ziskej_prehled_stran_a_hlasu_ze_soup(soup)
 
     hlasy_v_poradi = []
@@ -161,10 +179,16 @@ def zpracuj_detail_obce(kod_obce, nazev_obce, url_detail_obce, pevne_poradi_stra
         hodnota = slovnik_hlasu.get(nazev_strany, "0")
         hlasy_v_poradi.append(hodnota)
 
-    jeden_radek = [kod_obce, nazev_obce, volici_v_seznamu, vydane_obalky, platne_hlasy] + hlasy_v_poradi
+    jeden_radek = [kod_obce,
+                   nazev_obce,
+                   volici_v_seznamu,
+                   vydane_obalky,
+                   platne_hlasy] + hlasy_v_poradi
     return jeden_radek
 
+
 #### HLAVNÍ FUNKCE PROGRAMU
+
 
 def hlavni():
     """
@@ -180,12 +204,14 @@ def hlavni():
     vystupni_csv = sys.argv[2]
 
     #### získání seznamu obcí
+
     seznam_obci = najdi_obce_na_strance_vyber_obce(url_adresa_ps32)
     if len(seznam_obci) == 0:
         print("Nebyla nalezena žádná obec.")
         sys.exit(1)
 
     # z první obce získáme pevné pořadí názvů stran (30 sloupců)
+
     prvni_obec_url = seznam_obci[0][2]
     html_text_prvni = stahni_stranku(prvni_obec_url)
     soup_prvni = BeautifulSoup(html_text_prvni, "html.parser")
@@ -196,20 +222,32 @@ def hlavni():
         sys.exit(1)
 
     #### příprava hlavičky csv
-    hlavicka = ["code", "location", "registered", "envelopes", "valid"] + nazvy_stran_prvni_obec
+
+    hlavicka = [
+        "code",
+        "location",
+        "registered",
+        "envelopes",
+        "valid"] + nazvy_stran_prvni_obec
 
     #### zpracování všech obcí
+
     vsechny_radky = []
     for kod_obce, nazev_obce, url_detail_obce in seznam_obci:
-        jeden_radek = zpracuj_detail_obce(kod_obce, nazev_obce, url_detail_obce, nazvy_stran_prvni_obec)
+        jeden_radek = zpracuj_detail_obce(
+            kod_obce,
+            nazev_obce,
+            url_detail_obce,
+            nazvy_stran_prvni_obec
+        )
+
         vsechny_radky.append(jeden_radek)
 
     #### zápis do csv
+
     with open(vystupni_csv, mode="w", newline="", encoding="utf-8-sig") as csv_soubor:
         zapisovac = csv.writer(csv_soubor, delimiter=";")
-        zapisovac.writerow(hlavicka)
-        for jeden_radek in vsechny_radky:
-            zapisovac.writerow(jeden_radek)
+        zapisovac.writerows([hlavicka, *vsechny_radky])
 
     print("Hotovo! Data byla uložena do souboru:", vystupni_csv)
 
