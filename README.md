@@ -23,4 +23,14 @@ Tento příkaz stáhne výsledky voleb z daného odkazu a uloží je do souboru 
  
 - Výstupní soubor CSV bude vytvořen ve stejném adresáři, kde je spuštěn skript.
 
-
+Ukázka z výstupního CSV souboru:
+code	location	registered	envelopes	valid	Občanská demokratická strana	Řád národa - Vlastenecká unie	CESTA ODPOVĚDNÉ SPOLEČNOSTI	Česká str.sociálně demokrat.
+529303	Benešov	13104	8485	8437	1052	10	2	624
+532568	Bernartice	191	148	148	4	0	0	17
+530743	Bílkovice	170	121	118	7	0	0	15
+532380	Blažejovice	96	80	77	6	0	0	5
+532096	Borovnice	73	54	53	2	0	0	2
+532924	Bukovany	598	393	393	50	0	0	20
+529451	Bystřice	3490	2206	2200	204	6	2	187
+532690	Ctiboř	106	83	83	3	0	0	5
+529478	Čakov	93	71	71	7	0	0	6
